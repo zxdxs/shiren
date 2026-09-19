@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>識人訓練站 · 家學版</title>
+<meta name="description" content="家學版識人訓練站：練觀察、辨偏誤、學對帳。所有資料只存在你自己的裝置裡。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%237a5c3e'/><text x='16' y='24' font-size='21' text-anchor='middle' fill='%23fff' font-family='serif'>識</text></svg>">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#/">
+    <span class="brand-mark">識</span>
+    <span class="brand-text">
+      <strong>識人訓練站</strong>
+      <small>家學版 · 課孫用</small>
+    </span>
+  </a>
+  <button class="nav-toggle" id="navToggle" aria-label="選單" aria-expanded="false">☰</button>
+  <nav class="nav" id="nav"></nav>
+</header>
+
+<main id="main">
+
+  <!-- ============ 首頁 ============ -->
+  <section class="view" id="view-home">
+    <div class="hero">
+      <p class="brand-en" id="homeEn"></p>
+      <h1 id="homeTitle">識人訓練站</h1>
+      <p class="tagline" id="homeTagline"></p>
+      <p class="hero-note" id="homeThesis"></p>
+      <p class="hero-note layer-note" id="homeLayer"></p>
+      <div class="row-btns" id="homeCta"></div>
+    </div>
+
+    <div class="num-grid" id="homeNumbers"></div>
+
+    <div class="card-grid" id="homeCards"></div>
+
+    <div class="panel">
+      <h2>訓練怎麼進行</h2>
+      <p class="muted small" id="homeStepsNote"></p>
+      <p class="table-cap" id="homeStepsTitle"></p>
+      <div id="homeSteps"></div>
+    </div>
+
+    <div class="panel">
+      <h2>四層驗收</h2>
+      <p class="muted small" id="homeLevelsNote"></p>
+      <p class="table-cap" id="homeLevelsTitle"></p>
+      <div id="homeLevels"></div>
+    </div>
+
+    <div class="panel">
+      <h2>怎麼練</h2>
+      <ol class="tight" id="homeHow"></ol>
+    </div>
+
+    <div class="panel warmup-panel" id="homeWarmup"></div>
+
+    <div class="panel warn-panel">
+      <h2>⚠ 最重要的三條紅線</h2>
+      <ol class="tight" id="homeRedlines"></ol>
+      <p class="muted">完整五條紅線與教學提醒，在「<a href="#/teacher">給教學者</a>」。</p>
+    </div>
+  </section>
+
+  <!-- ============ 理念 ============ -->
+  <section class="view" id="view-philosophy" hidden>
+    <h1 id="phTitle"></h1>
+    <p class="lead" id="phLead"></p>
+    <div id="phList"></div>
+  </section>
+
+  <!-- ============ 課件（原典） ============ -->
+  <section class="view" id="view-lessons" hidden>
+    <h1>課件（原典）</h1>
+    <p class="lead">先把原典的骨架裝進腦子，再談練習。兩套骨架：望診的（汪宏）與體型的（《內經》＋《人物志》）。</p>
+    <div class="card-grid" id="lessonCards"></div>
+      <p class="table-cap" id="cwSummary"></p>
+      <div id="cwTracks"></div>
+    <div class="panel warn-panel">
+      <h2>可信度分級</h2>
+      <p>課件內容一律標 A／B／C／D：<strong>A 可直接教學</strong>（純觀察）、<strong>B 可作文化材料</strong>（古人的歸納）、<strong>C 僅供研究</strong>（理論配屬）、<strong>D 已剔除</strong>（命定論述，加密藏起）。</p>
+    </div>
+  </section>
+
+  <!-- ============ 應記誦 ============ -->
+  <section class="view" id="view-recite" hidden>
+    <h1 id="rcTitle"></h1>
+    <p class="lead" id="rcLead"></p>
+    <div class="panel hd-panel">
+      <h2>為什麼要背</h2>
+      <p id="rcWhy"></p>
+      <ol class="tight" id="rcHowTo"></ol>
+    </div>
+    <div class="panel">
+      <h2>記誦進度</h2>
+      <div class="calib-grid" id="rcStats"></div>
+      <div class="row-btns">
+        <label class="muted small"><input type="checkbox" id="rcOnlyTodo"> 只顯示「未背／在背」</label>
+        <button class="btn ghost" id="rcReset" type="button">重設全部狀態</button>
+      </div>
+    </div>
+    <div id="rcCats"></div>
+  </section>
+
+  <!-- ============ 體質基線 ============ -->
+  <section class="view" id="view-constitution" hidden>
+    <h1 id="ctTitle"></h1>
+    <p class="lead" id="ctLead"></p>
+    <div class="panel hd-panel">
+      <h2>為什麼要有「基線」</h2>
+      <p id="ctWhy"></p>
+      <p class="cl-purpose" id="ctKey"></p>
+    </div>
+    <div class="panel">
+      <h2 id="ctStdTitle"></h2>
+      <ul class="tight" id="ctStd"></ul>
+    </div>
+    <div class="panel">
+      <h2>九種體質（觀察特徵）</h2>
+      <p class="muted small" id="ctGrades"></p>
+      <div id="ctTypes"></div>
+    </div>
+    <div class="panel warmup-panel">
+      <h2>怎麼用</h2>
+      <div id="ctUse"></div>
+    </div>
+  </section>
+
+  <!-- ============ 分講課件 ============ -->
+  <section class="view" id="view-lesson" hidden>
+    <div class="row-btns">
+      <a class="btn ghost" href="#/lessons" style="text-decoration:none">← 回課件目錄</a>
+      <button class="btn" id="lnPrev" type="button">上一講</button>
+      <button class="btn" id="lnNext" type="button">下一講</button>
+    </div>
+    <p class="brand-en" id="lnTrack"></p>
+    <h1 id="lnTitle"></h1>
+    <p class="muted small" id="lnMeta"></p>
+
+    <div class="panel hd-panel">
+      <h2>學習目標</h2>
+      <p id="lnGoal"></p>
+      <p class="muted small" id="lnLayers"></p>
+    </div>
+
+    <div class="panel">
+      <h2>原文・標重點</h2>
+      <blockquote class="cl-orig big" id="lnOrig"></blockquote>
+      <p class="muted small">[[　]] 內為重點。原文以本站既有版本為準，差異見「出處」。</p>
+    </div>
+
+    <div class="panel">
+      <h2>白話</h2>
+      <p id="lnPlain"></p>
+    </div>
+
+    <div class="panel">
+      <h2>圖譜</h2>
+      <div id="lnChart"></div>
+      <p class="table-cap" id="lnChartTitle"></p>
+    </div>
+
+    <div class="panel">
+      <h2>線索</h2>
+      <p id="lnThread"></p>
+      <p class="muted small" id="lnTrackThread"></p>
+    </div>
+
+    <div class="panel warmup-panel">
+      <h2>練習點</h2>
+      <p id="lnDrillText"></p>
+      <a class="btn primary" id="lnDrill" style="text-decoration:none">去做這個訓練點 →</a>
+    </div>
+
+    <div id="lnExtra"></div>
+  </section>
+
+  <!-- ============ 方法（五步） ============ -->
+  <section class="view" id="view-method" hidden>
+    <h1>方法　五步執行單</h1>
+    <p class="lead" id="methodLead"></p>
+    <div id="methodSteps"></div>
+    <div class="panel">
+      <h2 id="fourLevelsTitle"></h2>
+      <p class="muted small" id="fourLevelsNote"></p>
+      <div id="fourLevelsBox"></div>
+    </div>
+  </section>
+
+  <!-- ============ 題庫（按訓練點） ============ -->
+  <section class="view" id="view-drills" hidden>
+    <h1 id="drillsTitle"></h1>
+    <p class="lead" id="drillsNote"></p>
+    <div id="drillsList"></div>
+  </section>
+
+  <!-- ============ 掌握度自測 ============ -->
+  <section class="view" id="view-mastery" hidden>
+    <h1 id="msTitle"></h1>
+    <p class="lead" id="msLead"></p>
+    <p class="muted small" id="msNote"></p>
+    <div class="progressbar"><div class="progressbar-fill" id="msBar"></div></div>
+    <p class="counter" id="msCounter"></p>
+    <div class="card-stack" id="msList"></div>
+    <div class="panel result-panel" id="msResult" hidden>
+      <h2>定位結果</h2>
+      <div id="msScore"></div>
+      <p id="msHint"></p>
+      <div id="msBreak"></div>
+      <button class="btn" data-restart="mastery">重測</button>
+    </div>
+  </section>
+
+  <!-- ============ 學習進度 ============ -->
+  <section class="view" id="view-progress" hidden>
+    <h1>學習進度</h1>
+    <p class="lead">這些數字直接從你這台裝置的記錄算出來——沒有伺服器，也沒有人能替你填。</p>
+    <div class="panel">
+      <h2>五步產出物</h2>
+      <div id="pgSteps"></div>
+    </div>
+    <div class="panel">
+      <h2>校準（唯一無法自欺的地方）</h2>
+      <div id="pgCalib"></div>
+    </div>
+    <div class="panel">
+      <h2>記錄存量</h2>
+      <div id="pgCounts"></div>
+    </div>
+  </section>
+
+  <!-- ============ 出處與版本溯源 ============ -->
+  <section class="view" id="view-provenance" hidden>
+    <h1 id="pvTitle"></h1>
+    <p class="lead" id="pvLead"></p>
+    <div class="panel">
+      <h2>來源與權利</h2>
+      <div id="pvSources"></div>
+    </div>
+    <div class="panel warn-panel">
+      <h2>免責</h2>
+      <p id="pvDisclaimer"></p>
+    </div>
+    <div class="panel">
+      <h2 id="pvVariantsTitle"></h2>
+      <p class="muted small" id="pvVariantsNote"></p>
+      <div id="pvVariants"></div>
+    </div>
+    <div class="panel warn-panel">
+      <h2 id="pvExcludedTitle"></h2>
+      <p id="pvExcludedBody"></p>
+      <p id="pvExcludedWhy"></p>
+      <p id="pvExcludedHow"></p>
+    </div>
+  </section>
+
+  <!-- ============ 只寫看見的 ============ -->
+  <section class="view" id="view-classify" hidden>
+    <h1>只寫看見的</h1>
+    <p class="lead" id="promptClassify"></p>
+    <div class="progressbar"><div class="progressbar-fill" id="classifyBar"></div></div>
+    <p class="counter" id="classifyCounter"></p>
+    <div class="card-stack" id="classifyList"></div>
+    <div class="panel result-panel" id="classifyResult" hidden>
+      <h2>做完了</h2>
+      <p id="classifySummary"></p>
+      <p class="muted">記住這條規則：<strong>左邊只寫眼睛看得到的，中間可以自由猜。</strong></p>
+      <button class="btn" data-restart="classify">再練一次</button>
+    </div>
+  </section>
+
+  <!-- ============ 偏誤找碴 ============ -->
+  <section class="view" id="view-quiz" hidden>
+    <h1>偏誤找碴</h1>
+    <p class="lead" id="promptQuiz"></p>
+    <div class="progressbar"><div class="progressbar-fill" id="quizBar"></div></div>
+    <p class="counter" id="quizCounter"></p>
+    <div class="quiz-card" id="quizCard"></div>
+    <div class="panel result-panel" id="quizResult" hidden>
+      <h2>做完了</h2>
+      <p id="quizSummary"></p>
+      <div id="quizReview"></div>
+      <button class="btn" data-restart="quiz">再練一次</button>
+    </div>
+  </section>
+
+  <!-- ============ 三個可能只是 ============ -->
+  <section class="view" id="view-scenarios" hidden>
+    <h1>三個「可能只是」</h1>
+    <p class="lead" id="promptScenarios"></p>
+    <p class="muted small">沒有標準答案。寫得出來就好——寫三個，不要只寫一個。</p>
+    <div class="card-stack" id="scenarioList"></div>
+  </section>
+
+  <!-- ============ 一致性遊戲 ============ -->
+  <section class="view" id="view-interrater" hidden>
+    <h1>一致性遊戲</h1>
+    <p class="lead" id="promptInterrater"></p>
+    <div class="panel">
+      <h3>玩法</h3>
+      <ol class="tight">
+        <li>全部人一起看<strong>同一段公開影片</strong>（動物紀錄片、動畫、公開訪談）。</li>
+        <li>各自<strong>獨立</strong>寫下「只看見的」，不可以討論。</li>
+        <li>把每個人的記錄貼進下面對應的格子，按「比對」。</li>
+        <li>看兩份名單：<strong>大家都寫到的</strong>（真在畫面上）、<strong>只有一個人寫到的</strong>（問他「你從哪裡看到的？」）。</li>
+      </ol>
+      <p class="muted small">★ 對象必須是公開影像，<strong>絕不用在場的人</strong>。比對採「完全相同才算同一條」，所以請盡量用相似的寫法。</p>
+    </div>
+    <div id="interraterInputs"></div>
+    <div class="row-btns">
+      <button class="btn" id="irAdd">＋ 加一位觀察者</button>
+      <button class="btn primary" id="irRun">比對</button>
+      <button class="btn ghost" id="irClear">清空</button>
+    </div>
+    <div class="panel result-panel" id="irResult" hidden></div>
+  </section>
+
+  <!-- ============ 舌頭日記 ============ -->
+  <section class="view" id="view-tongue" hidden>
+    <h1>舌頭日記</h1>
+    <p class="lead" id="promptTongue"></p>
+    <p class="muted small">⚠ 這是<strong>觀察練習與健康教育，不是診斷</strong>。不給病名、不給用藥。身體不舒服要看醫生。</p>
+    <div class="panel warn-panel" id="tongueZunJing"></div>
+    <form class="panel" id="tongueForm">
+      <div class="field">
+        <label>日期</label>
+        <input type="date" name="date" required>
+      </div>
+      <div class="field">
+        <label>昨晚睡幾小時</label>
+        <select name="sleep" id="sleepSel"></select>
+      </div>
+      <div class="field">
+        <label>今天精神</label>
+        <div class="chips" id="spiritChips"></div>
+      </div>
+      <div class="field">
+        <label>舌頭顏色（舌質）</label>
+        <div class="chips" id="bodyChips"></div>
+      </div>
+      <div class="field">
+        <label>舌苔</label>
+        <div class="chips" id="coatChips"></div>
+      </div>
+      <div class="field">
+        <label>心情</label>
+        <div class="chips" id="moodChips"></div>
+      </div>
+      <div class="field">
+        <label>想記的一句話（選填）</label>
+        <input type="text" name="note" maxlength="60" placeholder="例：昨天吃了很多冰">
+      </div>
+      <button class="btn primary" type="submit">記下來</button>
+    </form>
+    <div class="panel">
+      <h2>我的記錄</h2>
+      <div id="tongueList"></div>
+    </div>
+  </section>
+
+  <!-- ============ 我的猜測（對帳） ============ -->
+  <section class="view" id="view-ledger" hidden>
+    <h1>我的猜測</h1>
+    <p class="lead" id="promptLedger"></p>
+    <form class="panel" id="ledgerForm">
+      <div class="field">
+        <label>我看見的（只寫眼睛看到的）</label>
+        <input type="text" name="seen" required maxlength="80" placeholder="例：他講到一半停了兩秒，看了三次地上">
+      </div>
+      <div class="field">
+        <label>我猜的（可以自由猜）</label>
+        <input type="text" name="guess" required maxlength="80" placeholder="例：他可能有點緊張">
+      </div>
+      <div class="field">
+        <label>幾天後回來看？</label>
+        <select name="days" id="daysSel"></select>
+      </div>
+      <button class="btn primary" type="submit">記下來</button>
+    </form>
+    <div class="panel">
+      <h2>等你回來看</h2>
+      <div id="ledgerPending"></div>
+    </div>
+    <div class="panel">
+      <h2>已經對帳的</h2>
+      <div id="ledgerDone"></div>
+      <p class="counter" id="ledgerStats"></p>
+      <p class="muted small">★ 猜錯完全沒關係。「不知道」是很好的答案，不要怕寫。</p>
+    </div>
+  </section>
+
+  <!-- ============ 長期追蹤 ============ -->
+  <section class="view" id="view-track" hidden>
+    <h1>長期追蹤</h1>
+    <p class="lead" id="promptTrack"></p>
+
+    <div class="panel">
+      <h2>新增觀察對象</h2>
+      <form id="subjectForm">
+        <div class="field">
+          <label>代號（<strong>不要寫真名</strong>）</label>
+          <input type="text" name="code" required maxlength="20" placeholder="例：我、孫A、公開人物甲">
+        </div>
+        <div class="field">
+          <label>類型</label>
+          <div class="chips" id="typeChips"></div>
+        </div>
+        <div class="field">
+          <label>備註（選填）</label>
+          <input type="text" name="note" maxlength="60" placeholder="例：2026 年秋開始觀察">
+        </div>
+        <button class="btn primary" type="submit">新增觀察對象</button>
+      </form>
+      <p class="muted small" id="typeHint"></p>
+    </div>
+
+    <div class="panel">
+      <h2>觀察對象</h2>
+      <div id="subjectList"></div>
+    </div>
+
+    <div id="trackDetail" hidden>
+      <div class="panel">
+        <div class="detail-head">
+          <h2 id="tdTitle"></h2>
+          <a class="btn ghost" href="#/print" style="text-decoration:none">🖨 空白觀察表</a>
+          <button class="btn ghost" id="tdClose" type="button">收起</button>
+        </div>
+        <p class="muted small" id="tdMeta"></p>
+
+        <h3>趨勢（1–5，每次觀察的數字）</h3>
+        <div id="tdTrend"></div>
+
+        <h3>對帳與校準</h3>
+        <div id="tdCalib"></div>
+        <p class="muted small" id="calibHint"></p>
+
+        <h3 id="longTermTitle">七年之約（一年以上的長期對帳）</h3>
+        <div id="tdLongTerm"></div>
+      </div>
+
+      <div class="panel">
+        <button class="btn primary" id="btnNewSession" type="button">＋ 新增一次觀察</button>
+        <div id="sessionPanel" hidden>
+          <h3 id="sessionTitle">新增一次觀察</h3>
+          <div class="loop-reminder" id="loopReminder"></div>
+          <form id="sessionForm">
+            <div class="field">
+              <label>觀察日期</label>
+              <input type="date" name="date">
+            </div>
+
+            <h4 class="sec">一、只看見的（九徵）</h4>
+            <p class="muted small">只寫眼睛看得到、耳朵聽得到的。不要寫結論。</p>
+            <div id="channelsWrap"></div>
+
+            <h4 class="sec">二、當下狀態（短期可對帳）</h4>
+            <div id="stateWrap"></div>
+
+            <h4 class="sec">二之一、八觀自問（選填）</h4>
+            <p class="muted small">《人物志》八觀是八個<strong>問題</strong>，不是八個通道。記下這一輪你實際問了自己哪幾觀——沒問的，就是這次觀察的盲區。</p>
+            <div id="baguanWrap"></div>
+
+            <h4 class="sec">二之二、形體（古法觀察，選填）</h4>
+            <p class="muted small">可對照 <a href="#/classics">古法體型</a> 的 <strong>A 級</strong>觀察項：形色、鬚眉、掌肉、步態。<strong>只寫形，不要寫人。</strong></p>
+            <div id="formWrap"></div>
+
+            <h4 class="sec">二之四、肥瘦三型（純觀察）</h4>
+            <p class="muted small">《靈樞·衛氣失常》的膏／脂／肉——純形體，無人品、無命定。<a href="#/classics">打開古法體型</a></p>
+            <div id="fatWrap"></div>
+
+            <h4 class="sec">二之五、姿態（望診遵經卷下）</h4>
+            <p class="muted small">八法各圈一端；具體動作可多選。<strong>只收會變的姿態</strong>——疲勞、不適、疼痛、情緒都會改變姿態，這些幾天內能對帳。<a href="#/wangzhen">打開望診遵經</a></p>
+            <div id="postureWrap"></div>
+            <div id="postureActsWrap"></div>
+
+            <h4 class="sec">二之三、面部色診（尊經骨架）</h4>
+            <p class="muted small">位置依《靈樞·五色》與〈五閱五使〉。看<strong>浮沉、澤夭</strong>，不只辨顏色。<a href="#/wangzhen">打開望診尊經</a></p>
+            <div id="colorWrap"></div>
+
+            <h4 class="sec">三、五個數字（之後用來比趨勢）</h4>
+            <div id="ratingsWrap"></div>
+
+            <h4 class="sec">四、我的推測</h4>
+            <p class="muted small">每條都要寫信心與對帳日。心性層請把信心壓在 60 以下。</p>
+            <div id="guessesWrap"></div>
+            <button class="btn" id="addGuess" type="button">＋ 加一條推測</button>
+
+            <h4 class="sec">五、偏誤自檢（這次我可能犯了哪些）</h4>
+            <div id="biasWrap"></div>
+
+            <div class="field">
+              <label>備註（選填）</label>
+              <input type="text" name="note" maxlength="80">
+            </div>
+
+            <div class="row-btns">
+              <button class="btn primary" type="submit">存下這次觀察</button>
+              <button class="btn ghost" id="cancelSession" type="button">取消</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>對帳清單</h3>
+        <div id="tdGuesses"></div>
+      </div>
+
+      <div class="panel">
+        <h3>觀察歷史</h3>
+        <div id="tdHistory"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 望診遵經 ============ -->
+  <section class="view" id="view-wangzhen" hidden>
+    <h1>望診遵經</h1>
+    <p class="lead" id="promptWangzhen"></p>
+
+    <div class="panel" id="wzBookPanel"></div>
+
+    <div class="panel">
+      <h2>原文</h2>
+      <div class="tabs" id="wzTabs"></div>
+      <div id="wzBody"></div>
+    </div>
+
+    <div class="panel warn-panel">
+      <h2 id="wzTongueTitle"></h2>
+      <p id="wzTongueBody"></p>
+      <p id="wzTongueHistory"></p>
+      <p id="wzTongueImplication"></p>
+      <p id="wzTongueAction"></p>
+    </div>
+
+    <div class="panel">
+      <h2>D 級原文（研究用）</h2>
+      <div class="row-btns">
+        <button class="btn" id="btnDWZ" type="button"></button>
+      </div>
+      <div class="d-banner" id="dWZBanner" hidden></div>
+    </div>
+
+    <div class="panel">
+      <h2>教學用法</h2>
+      <div id="wzHowTo"></div>
+    </div>
+  </section>
+
+  <!-- ============ 古法體型 ============ -->
+  <section class="view" id="view-classics" hidden>
+    <h1>古法體型</h1>
+    <p class="lead" id="promptClassics"></p>
+    <div class="panel warn-panel">
+      <p id="classicsAudience"></p>
+    </div>
+
+    <div class="panel">
+      <h2>可信度分級</h2>
+      <p class="muted small">沿用「字形可信度分級」的同一套紀律——先分級，再決定能不能教。</p>
+      <div id="gradeBox"></div>
+    </div>
+
+    <div class="panel warn-panel">
+      <h2 id="excludedTitle"></h2>
+      <p id="excludedBody"></p>
+      <p id="excludedReason"></p>
+      <p id="excludedDecision"></p>
+    </div>
+
+    <div class="panel">
+      <h2>原文完整性（研究用）</h2>
+      <p class="muted small" id="dfullIntro"></p>
+      <div class="row-btns">
+        <button class="btn" id="btnDFull" type="button"></button>
+      </div>
+      <div class="d-banner" id="dBanner" hidden></div>
+      <div id="dPassages"></div>
+    </div>
+
+    <div class="panel">
+      <h2>原文整理</h2>
+      <div class="tabs" id="classicsTabs"></div>
+      <div id="classicsBody"></div>
+    </div>
+
+    <div class="panel">
+      <h2>教學用法</h2>
+      <div id="howToBox"></div>
+    </div>
+  </section>
+
+  <!-- ============ 列印版觀察表 ============ -->
+  <section class="view" id="view-print" hidden>
+    <h1>觀察表（列印版）</h1>
+    <p class="lead" id="promptPrint"></p>
+    <div class="row-btns">
+      <button class="btn primary" id="btnPrint" type="button">🖨 列印</button>
+      <a class="btn ghost" href="#/track" style="text-decoration:none">回長期追蹤</a>
+    </div>
+    <div class="sheet" id="printSheet"></div>
+  </section>
+
+  <!-- ============ 給教學者 ============ -->
+  <section class="view" id="view-teacher" hidden>
+    <h1>給教學者</h1>
+
+    <div class="panel warn-panel">
+      <h2>五條硬紅線（不可協商）</h2>
+      <div id="redlinesBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>三條提醒</h2>
+      <div id="teacherNotesBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>分齡單元</h2>
+      <div class="tabs" id="ageTabs"></div>
+      <div id="ageBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>五個招牌活動</h2>
+      <div id="activitiesBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>七繆 · 給孩子講的故事</h2>
+      <p class="muted small">出處：《人物志·七繆第十》（四庫全書本）。七繆是古人整理出來的「識人偏誤清單」。</p>
+      <div id="qimouBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>給大孩子聽的原文</h2>
+      <div id="quotesBox"></div>
+    </div>
+
+    <div class="panel">
+      <h2>資料</h2>
+      <p class="muted small">本站沒有伺服器、不做任何連線。所有記錄只存在<strong>這台裝置的瀏覽器</strong>裡。換裝置、換瀏覽器、或清除瀏覽資料，記錄就會消失——請定期匯出備份。</p>
+      <div class="row-btns">
+        <button class="btn" id="btnExport">匯出備份（JSON）</button>
+        <label class="btn ghost">
+          匯入備份
+          <input type="file" id="fileImport" accept=".json,application/json" hidden>
+        </label>
+        <button class="btn danger" id="btnWipe">清空全部記錄</button>
+      </div>
+      <p class="muted small" id="storageInfo"></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p><strong>識人訓練站</strong> · 家學版 · 免費分享</p>
+  <p class="muted small">
+    本站只教「觀察與提問的方法」，<strong>不教任何相術</strong>，也不提供任何醫療診斷。
+    所有記錄只留在你自己的裝置裡。
+  </p>
+</footer>
+
+<script src="assets/data.js"></script>
+<script src="assets/courseware.js"></script>
+<script src="assets/vault.js"></script>
+<script src="assets/crypto.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
