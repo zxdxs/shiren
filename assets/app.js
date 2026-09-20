@@ -563,11 +563,23 @@
     if (l.dVault) {
       var dp = el("div", "panel");
       dp.appendChild(el("h2", null, "原文（研究用，加密）"));
+
+      /* 解鎖鈕就放在這裡。原本只在「望診遵經」「古法體型」兩頁有，
+         結果在附講看到「已加密」的人得跑到別的頁才找得到按鈕。 */
+      var btnRow = el("div", "row-btns");
+      var gbtn = el("button", isUnlocked() ? "btn danger" : "btn",
+        isUnlocked() ? "🔓 已解鎖（按此鎖上）" : "🔒 解鎖 D 級原文");
+      gbtn.type = "button";
+      gbtn.id = "btnDLesson";
+      gbtn.addEventListener("click", unlockVault);
+      btnRow.appendChild(gbtn);
+      dp.appendChild(btnRow);
+
       if (!isUnlocked()) {
         var hint = el("p", "muted small");
         hint.appendChild(document.createTextNode(
           "其命定論述（貴賤、壽夭、子嗣、刑獄）已加密藏起，預設不顯示。" +
-          "通關處（兩處任選其一）："));
+          "也可以到「望診遵經」「古法體型」兩頁解鎖（同一把鑰匙）："));
         var a1 = el("a", null, "望診遵經 → 「D 級原文（研究用）」");
         a1.href = "#/wangzhen";
         var a2 = el("a", null, "古法體型 → 「原文完整性（研究用）」");
@@ -1743,10 +1755,16 @@
 
   function isUnlocked() { return !!vaultData; }
 
-  function lockVault() {
-    vaultData = null;
+  function refreshGateViews() {
     renderClassics();
     renderWangzhen();
+    /* 附講頁也有 D 區塊，且解鎖鈕就在那裡——必須一起更新 */
+    if ($("#lnExtra")) renderLesson();   // 用站內 $ 而非 document.getElementById（測試用的極簡 DOM 沒有後者）
+  }
+
+  function lockVault() {
+    vaultData = null;
+    refreshGateViews();
   }
 
   function unlockVault() {
@@ -1777,8 +1795,7 @@
     C.decrypt(V, pass).then(function (data) {
       unlocking = false;
       vaultData = data;
-      renderClassics();
-      renderWangzhen();
+      refreshGateViews();
     }).catch(function () {
       unlocking = false;
       alert("通關語不正確，或密文已損毀。");

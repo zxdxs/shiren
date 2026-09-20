@@ -294,6 +294,14 @@ try {
   ok(txt(byId("lnExtra")).indexOf("本站【不引其判斷內容】") >= 0, "附講：明示不引其判斷內容");
   /* 通關提示必須指向真正的解鎖處，且不得再誤指「教學者」頁（該頁沒有解鎖鈕） */
   ok(txt(byId("lnExtra")).indexOf("教學者") < 0, "附講：通關提示未誤指「教學者」頁");
+  /* 解鎖鈕必須就在附講頁上（先前只在望診／古法體型兩頁，找不到） */
+  const fjBtns = byId("lnExtra").children
+    .reduce((acc, c) => acc.concat(c.children || []), [])
+    .reduce((acc, c) => acc.concat(c.children || []), [])
+    .filter(c => c.tagName === "BUTTON" && c.id === "btnDLesson");
+  ok(fjBtns.length === 1, "附講：D 區塊自帶解鎖鈕（btnDLesson）");
+  ok(String(fjBtns[0] && fjBtns[0]._text).indexOf("解鎖") >= 0,
+     "附講：解鎖鈕文字 = " + (fjBtns[0] && fjBtns[0]._text));
   const hintLinks = byId("lnExtra").children
     .reduce((acc, c) => acc.concat(c.children || []), [])
     .reduce((acc, c) => acc.concat(c.children || []), [])

@@ -94,9 +94,20 @@ ok(dbg.length === 0, dbg.length ? "殘留除錯輸出：" + dbg.join("、") : "�
 const ds = files.filter(f => /\.DS_Store$/.test(f));
 ok(ds.length === 0, ds.length ? ".DS_Store 被追蹤了" : "無 .DS_Store 被追蹤");
 
-/* ---------- ⑦ GitHub Pages 專案頁相容 ---------- */
+/* ---------- ⑦ 解鎖入口可及性（防回歸） ---------- */
+/* 附講的 D 區塊必須自帶解鎖鈕。先前只在望診／古法體型兩頁有按鈕，
+   結果在附講看到「已加密」的人找不到它。 */
+console.log("\n⑦ 解鎖入口：附講頁必須自帶按鈕");
+const app = read("assets/app.js");
+ok(app.indexOf('gbtn.id = "btnDLesson"') >= 0, "附講 D 區塊自帶解鎖鈕 btnDLesson");
+ok(app.indexOf('renderLesson();   //') >= 0 || /refreshGateViews[\s\S]{0,200}renderLesson\(\)/.test(app),
+   "上鎖／解鎖會同步刷新附講");
+ok(app.indexOf("document.getElementById(\"lnExtra\")") < 0,
+   "未使用 document.getElementById（測試 DOM 不支援）");
+
+/* ---------- ⑧ GitHub Pages 專案頁相容 ---------- */
 /* 專案頁的網址是 /<repo>/，不是網域根。任何 "/assets/..." 這種根絕對路徑都會 404。 */
-console.log("\n⑦ GitHub Pages 專案頁：路徑必須是相對的");
+console.log("\n⑧ GitHub Pages 專案頁：路徑必須是相對的");
 const html = read("index.html");
 const absRefs = (html.match(/(?:src|href)="\/(?!\/)[^"]*"/g) || []);
 ok(absRefs.length === 0, absRefs.length ? "有根絕對路徑（專案頁會 404）：" + absRefs.join("、") : "無根絕對路徑（可放 /<repo>/ 子路徑）");
