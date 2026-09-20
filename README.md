@@ -1,4 +1,4 @@
-# 識人訓練站 · 家學版
+# 識人訓練站 · 家學承傳 · 課孫翁
 
 > 給孩子（孫輩、朋友子侄）用的識人訓練站。
 > **不是**教你「看穿別人」，是教你**先別急着下結論**——並且知道自己會看錯。
@@ -519,7 +519,7 @@ git config user.name  "你的名字"
 git config user.email "你的信箱"
 
 # ── ③ 提交並推送 ────────────────────────────────────────
-git commit -m "識人訓練站：家學版（D 級內容 AES-GCM 加密）"
+git commit -m "識人訓練站：家學承傳（D 級內容 AES-GCM 加密）"
 git remote add origin https://github.com/你的帳號/shiren-station.git
 git push -u origin main
 

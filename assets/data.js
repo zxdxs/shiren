@@ -10,7 +10,7 @@ window.STATION = {
 
   meta: {
     title: "識人訓練站",
-    subtitle: "家學版 · 課孫用",
+    subtitle: "家學承傳 · 課孫翁",
     tagline: "先別急著下結論——並且知道自己會看錯。",
     version: "1.0"
   },
