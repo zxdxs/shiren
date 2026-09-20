@@ -292,6 +292,14 @@ try {
   ok(txt(byId("lnExtra")).indexOf("白圍繞眼圈") < 0, "附講：未通關時不洩漏《冰鑑》原文");
   ok(txt(byId("lnExtra")).indexOf("火形人不貴則夭") < 0, "附講：未通關時不洩漏死期斷言");
   ok(txt(byId("lnExtra")).indexOf("本站【不引其判斷內容】") >= 0, "附講：明示不引其判斷內容");
+  /* 通關提示必須指向真正的解鎖處，且不得再誤指「教學者」頁（該頁沒有解鎖鈕） */
+  ok(txt(byId("lnExtra")).indexOf("教學者") < 0, "附講：通關提示未誤指「教學者」頁");
+  const hintLinks = byId("lnExtra").children
+    .reduce((acc, c) => acc.concat(c.children || []), [])
+    .reduce((acc, c) => acc.concat(c.children || []), [])
+    .filter(c => c.tagName === "A").map(c => c.href);
+  ok(hintLinks.indexOf("#/wangzhen") >= 0 && hintLinks.indexOf("#/classics") >= 0,
+     "附講：通關提示有指向兩個真實解鎖處（" + hintLinks.join(" / ") + "）");
 
   /* 回到人物志第一講，後續斷言才對得上 */
   byId("cwTracks").children[0].children[2].children[1].children[5].children[0].click();

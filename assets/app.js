@@ -564,9 +564,19 @@
       var dp = el("div", "panel");
       dp.appendChild(el("h2", null, "原文（研究用，加密）"));
       if (!isUnlocked()) {
-        dp.appendChild(el("p", "muted small",
+        var hint = el("p", "muted small");
+        hint.appendChild(document.createTextNode(
           "其命定論述（貴賤、壽夭、子嗣、刑獄）已加密藏起，預設不顯示。" +
-          "要看請先到「教學者」頁通關。"));
+          "通關處（兩處任選其一）："));
+        var a1 = el("a", null, "望診遵經 → 「D 級原文（研究用）」");
+        a1.href = "#/wangzhen";
+        var a2 = el("a", null, "古法體型 → 「原文完整性（研究用）」");
+        a2.href = "#/classics";
+        hint.appendChild(a1);
+        hint.appendChild(document.createTextNode("　·　"));
+        hint.appendChild(a2);
+        hint.appendChild(document.createTextNode("。在那裡按「🔒 解鎖 D 級原文」，再回到這一講。"));
+        dp.appendChild(hint);
       } else {
         var items = (vaultData || {})[l.dVault] || [];
         if (!items.length) {
