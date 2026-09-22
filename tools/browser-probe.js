@@ -132,6 +132,23 @@ async function goto(hash) {
   const relock = await evalJs(`(document.getElementById("btnDLesson")||{}).textContent`);
   chk("重新載入後自動上鎖", String(relock.value).indexOf("解鎖") >= 0 && String(relock.value).indexOf("已解鎖") < 0, String(relock.value));
 
+  // ---- 5. 版權受限區（第八繆底下的加密區）----
+  await send("Page.reload", { ignoreCache: true });
+  await sleep(3000);
+  await goto("#/teacher");
+  const mb0 = await evalJs(`document.getElementById("modernBiasBox").textContent`);
+  chk("第八繆已渲染", String(mb0.value).indexOf("倖存者偏差") >= 0);
+  chk("未通關：不洩漏章節目錄", String(mb0.value).indexOf("談心為萬能之本") < 0);
+  chk("未通關：不洩漏出版方文案", String(mb0.value).indexOf("古往今來") < 0);
+  chk("五卷卷名可公開（標題不受著作權保護）", String(mb0.value).indexOf("御人秘訣") >= 0);
+  chk("站上明示版權期限", String(mb0.value).indexOf("2036") >= 0);
+
+  await evalJs(`(() => { const b = Array.prototype.slice.call(document.querySelectorAll("#modernBiasBox button")).filter(function(x){ return x.textContent.indexOf("解鎖") >= 0; })[0]; if (b) b.click(); return 1; })()`);
+  await sleep(3000);
+  const mb1 = await evalJs(`document.getElementById("modernBiasBox").textContent`);
+  chk("解鎖後：章節目錄出現", String(mb1.value).indexOf("談心為萬能之本") >= 0);
+  chk("解鎖後：出版方文案出現", String(mb1.value).indexOf("古往今來") >= 0);
+
   console.log(out.join("\n"));
   console.log("\n對話框訊息：" + JSON.stringify(dialogs));
   process.exit(0);
