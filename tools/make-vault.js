@@ -73,7 +73,8 @@ if (!FROM) {
 /* 逐鍵統計：任何新加入 vault 的鍵都會自動被算到，不會漏報。 */
 const LABELS = {
   dFull: "古法體型 D 級", forms: "完整原文", chapters: "內經各章 D 級",
-  zunjing: "遵經 D 級", posture: "姿態 D 級", bingjian: "《冰鑑》D 級"
+  zunjing: "遵經 D 級", posture: "姿態 D 級", bingjian: "《冰鑑》D 級",
+  xiaotianshi: "蕭天石·版權受限"
 };
 function tally(v) {
   if (Array.isArray(v)) return v.length;               /* 清單：算條數 */

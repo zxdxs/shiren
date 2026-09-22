@@ -1760,6 +1760,8 @@
     renderWangzhen();
     /* 附講頁也有 D 區塊，且解鎖鈕就在那裡——必須一起更新 */
     if ($("#lnExtra")) renderLesson();   // 用站內 $ 而非 document.getElementById（測試用的極簡 DOM 沒有後者）
+    /* 「給教學者」頁的第八繆也有加密區（版權受限） */
+    if ($("#modernBiasBox")) renderModernBias();
   }
 
   function lockVault() {
@@ -3311,6 +3313,8 @@
       qb.appendChild(d);
     });
 
+    renderModernBias();
+
     var quo = $("#quotesBox");
     quo.innerHTML = "";
     S.quotes.forEach(function (q) {
@@ -3322,6 +3326,88 @@
     });
 
     updateStorageInfo();
+  }
+
+  /* ---------- 第八繆（現代）：倖存者偏差 ---------- */
+  function renderModernBias() {
+    var mb = $("#modernBiasBox");
+    if (!mb || !S.modernBiases) return;
+    mb.innerHTML = "";
+
+    S.modernBiases.forEach(function (b) {
+      var d = el("div", "qm");
+      d.appendChild(el("div", "qm-h", b.name));
+      d.appendChild(el("div", "qm-p", b.plain));
+      d.appendChild(el("p", "qm-story", "📖 " + b.story));
+      d.appendChild(el("div", "qm-note", "偏誤自檢：" + b.hint));
+      d.appendChild(el("p", "cl-purpose", b.why));
+
+      /* 實物標本：只列書目事實，原文一律不引 */
+      var bk = b.book;
+      if (bk) {
+        var box = el("div", "cl-card");
+        box.appendChild(el("div", "cl-title", "實物標本：" + bk.t));
+        box.appendChild(el("p", "muted small", bk.a + "　·　" + bk.pub));
+        var chips = el("div", "chips");
+        bk.vols.forEach(function (v) { chips.appendChild(el("span", "chip static", v)); });
+        box.appendChild(chips);
+        box.appendChild(el("p", "cl-purpose", bk.why));
+        box.appendChild(el("p", "cl-trait", bk.note));
+        d.appendChild(box);
+      }
+      mb.appendChild(d);
+
+      /* 版權受限內容：與 D 級同一把鑰匙，但理由不同——那些是「不該看」，這些是「不能公開放」 */
+      if (bk && bk.dVault) {
+        mb.appendChild(vaultPanel(
+          "加密區：書目、目錄與出版方文案（版權受限）",
+          bk.dVault,
+          "此書仍在版權期（至 2036-12-31）。書目、五卷目錄與出版方文案已加密藏起，預設不顯示——", 
+          "🔒 解鎖加密區",
+          "🔓 已解鎖（按此鎖上）"
+        ));
+      }
+    });
+  }
+
+  /* 通用的加密區塊：解鎖鈕 ＋ 內容。
+     與 D 級共用同一把鑰匙，但分開呈現——理由不同：
+     D 級是「不該給孩子看見」，版權受限是「不能公開放在 repo 裡」。 */
+  function vaultPanel(title, vaultKey, lockedHint, labelLocked, labelUnlocked) {
+    var dp = el("div", "panel");
+    dp.appendChild(el("h2", null, title));
+    var row = el("div", "row-btns");
+    var b = el("button", isUnlocked() ? "btn danger" : "btn",
+      isUnlocked() ? (labelUnlocked || "🔓 已解鎖（按此鎖上）") : (labelLocked || "🔒 解鎖"));
+    b.type = "button";
+    b.addEventListener("click", unlockVault);
+    row.appendChild(b);
+    dp.appendChild(row);
+
+    if (!isUnlocked()) {
+      var hint = el("p", "muted small");
+      hint.appendChild(document.createTextNode(lockedHint || ""));
+      var a1 = el("a", null, "望診遵經 →「D 級原文（研究用）」");
+      a1.href = "#/wangzhen";
+      var a2 = el("a", null, "古法體型 →「原文完整性（研究用）」");
+      a2.href = "#/classics";
+      hint.appendChild(document.createTextNode("通關處："));
+      hint.appendChild(a1);
+      hint.appendChild(document.createTextNode("　·　"));
+      hint.appendChild(a2);
+      hint.appendChild(document.createTextNode("。"));
+      dp.appendChild(hint);
+    } else {
+      var items = (vaultData || {})[vaultKey] || [];
+      if (!items.length) {
+        dp.appendChild(el("p", "muted small", "（這一區尚未寫入 vault。）"));
+      }
+      items.forEach(function (d) {
+        dp.appendChild(el("blockquote", "cl-orig", d.text));
+        dp.appendChild(el("p", "cl-d", d.why));
+      });
+    }
+    return dp;
   }
 
   function renderAge(i) {

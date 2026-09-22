@@ -94,10 +94,37 @@ ok(dbg.length === 0, dbg.length ? "殘留除錯輸出：" + dbg.join("、") : "�
 const ds = files.filter(f => /\.DS_Store$/.test(f));
 ok(ds.length === 0, ds.length ? ".DS_Store 被追蹤了" : "無 .DS_Store 被追蹤");
 
-/* ---------- ⑦ 解鎖入口可及性（防回歸） ---------- */
+/* ---------- ⑦ 版權受限內容：不得有任何明文 ---------- */
+/* 蕭天石《世界偉人成功秘訣之分析》1986 年作者辭世，終身＋50 年至 2036-12-31。
+   站上只准出現「書目事實」（書名／作者／出版社／卷名），
+   出版方文案與章節層級目錄一律只能在密文裡。 */
+console.log("\n⑦ 版權受限內容：不得有明文");
+const CR = [
+  "古往今來，談人生修養之圖籍",          // 出版方內容簡介
+  "談心為萬能之本",                      // 卷一章目
+  "自信力之偉大奇蹟",
+  "根木功夫",
+  "石屋金言"
+];
+/* 只掃「會發布出去的內容檔」。tools/ 是檢查工具本身，裡面出現這些字串
+   是搜尋樣式，不是內容——把它們也算進來會讓檢查自己告自己。 */
+const CONTENT = ["index.html", "README.md", "assets/data.js", "assets/app.js",
+                 "assets/courseware.js", "assets/crypto.js", "assets/style.css"];
+const crHits = [];
+CONTENT.forEach(function (f) {
+  const t = read(f);
+  CR.forEach(function (w) { if (t.indexOf(w) >= 0) crHits.push(f + " → " + w); });
+});
+ok(crHits.length === 0, crHits.length ? "版權內容外洩：" + crHits.join("、") : "版權受限內容全部只在密文裡");
+const appSrc7 = read("assets/app.js");
+ok(appSrc7.indexOf("2036") >= 0, "站上明示版權期限（至 2036-12-31）");
+const dataSrc7 = read("assets/data.js");
+ok(dataSrc7.indexOf("不引任何原文") >= 0, "站上明示「不引任何原文」");
+
+/* ---------- ⑧ 解鎖入口可及性（防回歸） ---------- */
 /* 附講的 D 區塊必須自帶解鎖鈕。先前只在望診／古法體型兩頁有按鈕，
    結果在附講看到「已加密」的人找不到它。 */
-console.log("\n⑦ 解鎖入口：附講頁必須自帶按鈕");
+console.log("\n⑧ 解鎖入口：附講頁必須自帶按鈕");
 const app = read("assets/app.js");
 ok(app.indexOf('gbtn.id = "btnDLesson"') >= 0, "附講 D 區塊自帶解鎖鈕 btnDLesson");
 ok(app.indexOf('renderLesson();   //') >= 0 || /refreshGateViews[\s\S]{0,200}renderLesson\(\)/.test(app),
@@ -105,9 +132,9 @@ ok(app.indexOf('renderLesson();   //') >= 0 || /refreshGateViews[\s\S]{0,200}ren
 ok(app.indexOf("document.getElementById(\"lnExtra\")") < 0,
    "未使用 document.getElementById（測試 DOM 不支援）");
 
-/* ---------- ⑧ GitHub Pages 專案頁相容 ---------- */
+/* ---------- ⑨ GitHub Pages 專案頁相容 ---------- */
 /* 專案頁的網址是 /<repo>/，不是網域根。任何 "/assets/..." 這種根絕對路徑都會 404。 */
-console.log("\n⑧ GitHub Pages 專案頁：路徑必須是相對的");
+console.log("\n⑨ GitHub Pages 專案頁：路徑必須是相對的");
 const html = read("index.html");
 const absRefs = (html.match(/(?:src|href)="\/(?!\/)[^"]*"/g) || []);
 ok(absRefs.length === 0, absRefs.length ? "有根絕對路徑（專案頁會 404）：" + absRefs.join("、") : "無根絕對路徑（可放 /<repo>/ 子路徑）");

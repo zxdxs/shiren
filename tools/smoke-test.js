@@ -273,6 +273,30 @@ try {
   ok(CT.key.indexOf("一生的判決") >= 0, "體質：明示可變，非判決");
   ok(CT.grades.some(g => g.k === "A") && CT.grades.some(g => g.k === "B"), "體質：A／B 兩級並列");
 
+  /* --- 第八繆（現代）：倖存者偏差 --- */
+  const MB = sandbox.window.STATION.modernBiases;
+  ok(Array.isArray(MB) && MB.length === 1, "現代偏誤 1 條");
+  ok(MB[0].name === "倖存者偏差", "第八繆＝倖存者偏差");
+  ok(sandbox.window.STATION.qimou.length === 7,
+     "七繆仍是封閉的七條（未被增補）：" + sandbox.window.STATION.qimou.length);
+  ok(sandbox.window.STATION.quizOptions.length === 9, "題庫選項 9 個（七繆＋急下結論＋倖存者偏差）");
+  ok(sandbox.window.STATION.quiz.length === 11, "題庫 11 題");
+  ok(sandbox.window.STATION.quiz[10].a === 8, "第 11 題答案指向倖存者偏差");
+  ok(!!MB[0].book && MB[0].book.dVault === "xiaotianshi", "第八繆掛上版權加密區");
+  ok(sandbox.window.STATION.system.provenance.sources.length === 7, "出處列 7 條");
+
+  go("#/teacher");
+  ok(byId("modernBiasBox").children.length >= 1, "第八繆已渲染");
+  const mbt = txt(byId("modernBiasBox"));
+  ok(mbt.indexOf("倖存者偏差") >= 0 && mbt.indexOf("沃德") >= 0, "第八繆：含偏誤名稱與沃德的故事");
+  ok(mbt.indexOf("蕭天石") >= 0, "第八繆：標出實物標本");
+  ok(mbt.indexOf("2036") >= 0, "第八繆：標明版權期限");
+  ok(mbt.indexOf("古往今來") < 0, "第八繆：未通關時不洩漏出版方文案");
+  ok(mbt.indexOf("談心為萬能之本") < 0, "第八繆：未通關時不洩漏章節層級目錄");
+  ok(mbt.indexOf("自信力之偉大奇蹟") < 0, "第八繆：未通關時不洩漏章節標題");
+  ok(mbt.indexOf("卷三　御人秘訣篇") >= 0,
+     "第八繆：五卷卷名可公開（標題不受著作權保護）");
+
   /* --- 附講：警示、教學用法、加密原文（此時尚未通關） --- */
   go("#/lessons");
   const fjTi = CW.tracks.findIndex(t => t.lessons.some(l => l.dVault));
@@ -390,7 +414,7 @@ try {
   ok(byId("msBreak").children.length === 4, "分層統計 4 列");
 
   go("#/provenance");
-  ok(byId("pvSources").children[0].children.length === 7, "來源表 1 表頭 + 6 來源");
+  ok(byId("pvSources").children[0].children.length === 8, "來源表 1 表頭 + 7 來源");
   ok(byId("pvVariants").children[0].children.length === 6, "版本差異表 1 表頭 + 5 條");
   ok(txt(byId("pvSources")).indexOf("望診遵經") >= 0, "來源含望診遵經");
   ok(txt(byId("pvSources")).indexOf("公有領域") >= 0, "標明權利狀態");
@@ -416,10 +440,10 @@ try {
     if (nx.length) nx[0].click(); else break;
   }
   ok(byId("quizResult").hidden === false, "顯示結果面板");
-  ok(byId("quizReview").children.length === 10, "檢討清單 10 條");
+  ok(byId("quizReview").children.length === 11, "檢討清單 11 條");
   {
     const dv = JSON.parse(localStorage.getItem("shiren.v1"));
-    ok(dv.drills && dv.drills.quiz && dv.drills.quiz.done === 10, "題庫完成度已寫入記錄");
+    ok(dv.drills && dv.drills.quiz && dv.drills.quiz.done === 11, "題庫完成度已寫入記錄");
   }
 
   section("只寫看見的：答完 12 題");
@@ -826,6 +850,14 @@ try {
     byId("wzTabs").children[3].click();
     const posU = txt(byId("wzBody"));
     ok(BAN.posture.filter(w => posU.indexOf(w) >= 0).length >= 2, "解鎖後：姿態 D 級（死候）出現");
+
+    // ④a 同一把鑰匙也開「第八繆」的版權受限區
+    go("#/teacher");
+    const xU = txt(byId("modernBiasBox"));
+    ok(xU.indexOf("古往今來") >= 0, "解鎖後：蕭天石版權區—出版方文案出現");
+    ok(xU.indexOf("談心為萬能之本") >= 0, "解鎖後：蕭天石版權區—章節目錄出現");
+    ok(xU.indexOf("自信力之偉大奇蹟") >= 0, "解鎖後：蕭天石版權區—卷一章目出現");
+    ok(xU.indexOf("原文摘錄插槽") >= 0, "解鎖後：蕭天石版權區—原文插槽說明出現");
 
     // ④b 同一把鑰匙也開附講的《冰鑑》原文
     go("#/lessons");
