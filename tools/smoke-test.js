@@ -284,7 +284,7 @@ try {
   ok(sandbox.window.STATION.quiz.length === 11, "題庫 11 題");
   ok(sandbox.window.STATION.quiz[10].a === 8, "第 11 題答案指向倖存者偏差");
   ok(!!MB[0].book && MB[0].book.dVault === "xiaotianshi", "第八繆掛上版權加密區");
-  ok(sandbox.window.STATION.system.provenance.sources.length === 7, "出處列 7 條");
+  ok(sandbox.window.STATION.system.provenance.sources.length === 8, "出處列 8 條");
 
   go("#/teacher");
   ok(byId("modernBiasBox").children.length >= 1, "第八繆已渲染");
@@ -415,7 +415,7 @@ try {
   ok(byId("msBreak").children.length === 4, "分層統計 4 列");
 
   go("#/provenance");
-  ok(byId("pvSources").children[0].children.length === 8, "來源表 1 表頭 + 7 來源");
+  ok(byId("pvSources").children[0].children.length === 9, "來源表 1 表頭 + 8 來源");
   ok(byId("pvVariants").children[0].children.length === 6, "版本差異表 1 表頭 + 5 條");
   ok(txt(byId("pvSources")).indexOf("望診遵經") >= 0, "來源含望診遵經");
   ok(txt(byId("pvSources")).indexOf("公有領域") >= 0, "標明權利狀態");
