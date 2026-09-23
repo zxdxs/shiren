@@ -21,6 +21,7 @@
     { id: "mastery",    icon: "📈", title: "自測",     desc: "掌握度定位：你在哪一層。", hash: "#/mastery" },
     { id: "progress",   icon: "🗂", title: "進度",     desc: "五步產出物與校準數據。", hash: "#/progress" },
     { id: "constitution", icon: "⚖️", title: "體質基線", desc: "中醫那半邊的基線：九種體質——體質是基線，狀態是偏離。", hash: "#/constitution" },
+    { id: "cases",      icon: "🏺", title: "案例復訓", desc: "延伸訓練：用《史記》三篇帶結局的樣本，練判斷的形式。不替代真人推測單。", hash: "#/cases" },
     { id: "provenance", icon: "📜", title: "出處",     desc: "版權、來源與版本差異留痕。", hash: "#/provenance" },
     { id: "teacher",    icon: "📖", title: "給教學者", desc: "紅線、分齡單元、教學用法。", hash: "#/teacher" }
   ];
@@ -64,22 +65,34 @@
   }
 
   /* ---------------- 狀態 ---------------- */
-  var state = { tongue: [], ledger: [], scenarios: {}, subjects: [], sessions: [], drills: {}, recite: {} };
+  /* 狀態的唯一真實來源。新增鍵只要改這裡——先前 wipeData 用字面量複製一份，
+     三處各寫一次，加鍵時必漏。 */
+  function defaultState() {
+    return { tongue: [], ledger: [], scenarios: {}, subjects: [], sessions: [], drills: {}, recite: {}, cases: {} };
+  }
+
+  var state = defaultState();
+
+  /* 把任意來源的物件正規化成合法狀態（缺鍵補預設，型別不對就丟棄） */
+  function adoptState(o) {
+    var d = defaultState();
+    if (!o || typeof o !== "object") return d;
+    d.tongue = Array.isArray(o.tongue) ? o.tongue : [];
+    d.ledger = Array.isArray(o.ledger) ? o.ledger : [];
+    d.scenarios = (o.scenarios && typeof o.scenarios === "object") ? o.scenarios : {};
+    d.subjects = Array.isArray(o.subjects) ? o.subjects : [];
+    d.sessions = Array.isArray(o.sessions) ? o.sessions : [];
+    d.drills = (o.drills && typeof o.drills === "object") ? o.drills : {};
+    d.recite = (o.recite && typeof o.recite === "object") ? o.recite : {};
+    d.cases = (o.cases && typeof o.cases === "object") ? o.cases : {};
+    return d;
+  }
 
   function loadState() {
     try {
       var raw = localStorage.getItem(KEY);
       if (!raw) return;
-      var o = JSON.parse(raw);
-      if (o && typeof o === "object") {
-        state.tongue = Array.isArray(o.tongue) ? o.tongue : [];
-        state.ledger = Array.isArray(o.ledger) ? o.ledger : [];
-        state.scenarios = (o.scenarios && typeof o.scenarios === "object") ? o.scenarios : {};
-        state.subjects = Array.isArray(o.subjects) ? o.subjects : [];
-        state.sessions = Array.isArray(o.sessions) ? o.sessions : [];
-        state.drills = (o.drills && typeof o.drills === "object") ? o.drills : {};
-        state.recite = (o.recite && typeof o.recite === "object") ? o.recite : {};
-      }
+      state = adoptState(JSON.parse(raw));
     } catch (e) {
       console.warn("讀取記錄失敗，改用空白狀態：", e);
     }
@@ -103,7 +116,37 @@
      路由
      ============================================================ */
   var VIEWS = ["home", "philosophy", "lessons", "lesson", "recite", "method", "drills", "mastery", "progress", "provenance",
-    "classify", "quiz", "scenarios", "interrater", "tongue", "ledger", "track", "constitution", "wangzhen", "classics", "print", "teacher"];
+    "classify", "quiz", "scenarios", "interrater", "tongue", "ledger", "track", "constitution", "wangzhen", "classics", "print", "cases", "teacher"];
+
+  /* view → 初始化函式。ensure() 與 rerenderInited() 共用這一份，
+     新增 view 只要在這裡加一行（先前是兩處手寫 if 串，必漏）。 */
+  var RENDERERS = {
+    classify: renderClassify, quiz: renderQuiz, scenarios: renderScenarios,
+    interrater: renderInterrater, tongue: renderTongue, ledger: renderLedger,
+    track: renderTrack, philosophy: renderPhilosophy, lessons: renderLessons,
+    lesson: renderLesson, recite: renderRecite, method: renderMethod,
+    drills: renderDrills, mastery: renderMastery, progress: renderProgress,
+    provenance: renderProvenance, constitution: renderConstitution,
+    wangzhen: renderWangzhen, classics: renderClassics, print: renderPrintSheet,
+    cases: renderCases
+  };
+  var inited = {};
+
+  function ensure(route) {
+    if (inited[route]) return;
+    if (!RENDERERS[route]) return;
+    inited[route] = true;
+    RENDERERS[route]();
+  }
+
+  /* 整份資料被替換（匯入／清空）之後，把所有已初始化過的 view 重畫一次。
+     舊寫法是手寫清單（renderTeacher/renderTongueList/…），
+     漏了 recite、progress，以及後來新增的 view——那些頁面會一直顯示舊資料。 */
+  function rerenderInited() {
+    Object.keys(inited).forEach(function (r) {
+      if (inited[r] && RENDERERS[r]) RENDERERS[r]();
+    });
+  }
 
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, "").trim();
@@ -3469,16 +3512,10 @@
         var d = o && o.data ? o.data : o;
         if (!d || typeof d !== "object") throw new Error("格式不對");
         if (!confirm("匯入會覆蓋目前這台裝置上的記錄。要繼續嗎？\n（建議先按「匯出備份」留一份）")) return;
-        state.tongue = Array.isArray(d.tongue) ? d.tongue : [];
-        state.ledger = Array.isArray(d.ledger) ? d.ledger : [];
-        state.scenarios = (d.scenarios && typeof d.scenarios === "object") ? d.scenarios : {};
-        state.subjects = Array.isArray(d.subjects) ? d.subjects : [];
-        state.sessions = Array.isArray(d.sessions) ? d.sessions : [];
-        state.drills = (d.drills && typeof d.drills === "object") ? d.drills : {};
-        state.recite = (d.recite && typeof d.recite === "object") ? d.recite : {};
+        state = adoptState(d);
         saveState();
         trackSel = null;
-        renderTeacher(); renderTongueList(); renderLedgerLists(); renderScenarios(); renderTrack();
+        rerenderInited();
         alert("匯入完成。");
       } catch (e) {
         alert("匯入失敗：這個檔案不是本站的備份檔。");
@@ -3491,11 +3528,349 @@
   function wipeData() {
     if (!confirm("這會清空這台裝置上所有記錄（舌頭日記、猜測、練習）。要繼續嗎？")) return;
     if (!confirm("真的確定嗎？清除後無法復原——建議先「匯出備份」。")) return;
-    state = { tongue: [], ledger: [], scenarios: {}, subjects: [], sessions: [], drills: {}, recite: {} };
+    state = defaultState();
     try { localStorage.removeItem(KEY); } catch (e) {}
     trackSel = null;
-    renderTeacher(); renderTongueList(); renderLedgerLists(); renderScenarios(); renderTrack();
+    rerenderInited();
     alert("已清空。");
+  }
+
+  /* ============================================================
+     案例復訓（史料案例）
+     ------------------------------------------------------------
+     定位：【延伸訓練】，不替代主線（真人觀察 ＋ 推測單）。
+     用四步（觀察／判斷／推測／核對）——是主線五步在史料情境下的減法。
+     史料取《史記》正文，公有領域。
+     ============================================================ */
+  var csSel = 0;
+
+  /* 存檔形狀：
+     state.cases[id] = { a:{ "題號:列號":{text,basis} }, m:{ "題號:句號":"fact"|"eval" }, e:[勾選], upd:"" } */
+  function caseRec(id) {
+    if (!state.cases || typeof state.cases !== "object") state.cases = {};
+    var r = state.cases[id];
+    if (!r || typeof r !== "object") r = state.cases[id] = {};
+    if (!r.a || typeof r.a !== "object") r.a = {};
+    if (!r.m || typeof r.m !== "object") r.m = {};
+    if (!Array.isArray(r.e)) r.e = [];
+    return r;
+  }
+  function caseSave(id) { caseRec(id).upd = todayStr(); saveState(); }
+
+  /* 小工具：由「表頭＋列」生出 .sheet-table */
+  function csTable(heads, rows) {
+    var t = el("table", "sheet-table");
+    var hr = el("tr");
+    heads.forEach(function (h) { hr.appendChild(el("th", null, h)); });
+    t.appendChild(hr);
+    rows.forEach(function (r) {
+      var tr = el("tr");
+      r.forEach(function (c, i) { tr.appendChild(el("td", i === 0 ? "sh-k" : null, c)); });
+      t.appendChild(tr);
+    });
+    return t;
+  }
+
+  function renderCases() {
+    var C = window.CASES;
+    if (!C || !C.cases || !C.cases.length) return;
+    var M = C.meta;
+
+    $("#csTitle").textContent = M.title;
+    $("#csEn").textContent = M.en;
+
+    /* ---- 定位說明：照抄，不得改寫 ---- */
+    var pb = $("#csPositioning");
+    pb.innerHTML = "";
+    M.positioning.forEach(function (t, i) {
+      pb.appendChild(el("p", i === 0 ? "cl-purpose" : "cl-trait", t));
+    });
+
+    $("#csStepNote").textContent = M.stepNote;
+    $("#csStepWhy").textContent = M.stepWhy;
+    var sm = $("#csStepMap");
+    sm.innerHTML = "";
+    sm.appendChild(csTable(["案例四步", "對應主線", "差在哪"],
+      M.stepMap.map(function (r) { return [r.c, r.m, r.d]; })));
+
+    $("#csMarkTitle").textContent = M.markTitle;
+    $("#csMarkWhy").textContent = M.markWhy;
+    $("#csMarkWarn").textContent = M.markWarn;
+    var lg = $("#csLegend");
+    lg.innerHTML = "";
+    M.legend.forEach(function (g) {
+      var d = el("div", "lg-row");
+      d.appendChild(el("span", "chip static", g.name));
+      d.appendChild(el("span", "muted small", g.d));
+      lg.appendChild(d);
+    });
+
+    /* ---- 三篇 tabs ---- */
+    var tabs = $("#csTabs");
+    tabs.innerHTML = "";
+    C.cases.forEach(function (c, i) {
+      var b = el("button", "tab" + (i === csSel ? " on" : ""), c.no + "　" + c.title);
+      b.type = "button";
+      b.addEventListener("click", function () {
+        csSel = i;
+        $$(".tab", tabs).forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        renderCaseBody();
+        window.scrollTo(0, 0);
+      });
+      tabs.appendChild(b);
+    });
+    renderCaseBody();
+  }
+
+  /* ---- 單選：判斷欄 ＋ 依據欄。只填判斷不填依據 → 明確提示「無法復盤」 ---- */
+  function csPair(caseId, rec, key, label, longOnly) {
+    var r = rec.a[key] || (rec.a[key] = { text: "", basis: "" });
+    var wrap = el("div", "case-pair");
+    if (label) wrap.appendChild(el("div", "cp-label", label));
+
+    var f1 = el("div", "field");
+    f1.appendChild(el("label", null, longOnly ? "你的判斷" : "判斷"));
+    var ta = el("textarea");
+    ta.value = r.text || "";
+    f1.appendChild(ta);
+
+    var f2 = el("div", "field");
+    f2.appendChild(el("label", null, "依據（哪一句話／哪一個動作）"));
+    var tb = el("textarea");
+    tb.value = r.basis || "";
+    f2.appendChild(tb);
+
+    var warn = el("p", "basis-warn", "⚠ 只寫了判斷、沒寫依據——這一條無法復盤。");
+    function sync() {
+      r.text = ta.value.trim(); r.basis = tb.value.trim();
+      warn.hidden = !(r.text && !r.basis);
+      caseSave(caseId);
+    }
+    ta.addEventListener("input", sync);
+    tb.addEventListener("input", sync);
+    sync();
+    wrap.appendChild(f1); wrap.appendChild(f2); wrap.appendChild(warn);
+    return wrap;
+  }
+
+  /* ---- 句子標記：事實／評價 ---- */
+  function csMarkItem(caseId, rec, ti, ii, it, ansSink) {
+    var key = ti + ":" + ii;
+    var row = el("div", "mark-row");
+
+    var sent = el("div", "mark-sent", it.t);
+    row.appendChild(sent);
+
+    var btns = el("div", "mark-btns");
+    var bF = el("button", "chip", "行為事實");
+    var bE = el("button", "chip", "評價性措辭");
+    bF.type = "button"; bE.type = "button";
+    function paint() {
+      bF.className = "chip" + (rec.m[key] === "fact" ? " on" : "");
+      bE.className = "chip" + (rec.m[key] === "eval" ? " on" : "");
+    }
+    bF.addEventListener("click", function () { rec.m[key] = "fact"; paint(); caseSave(caseId); });
+    bE.addEventListener("click", function () { rec.m[key] = "eval"; paint(); caseSave(caseId); });
+    paint();
+    btns.appendChild(bF); btns.appendChild(bE);
+    row.appendChild(btns);
+
+    var ans = el("div", "mark-ans");
+    ans.hidden = true;
+    var right = el("div", "ma-h");
+    right.appendChild(el("span", "tag", it.a === "fact" ? "正解：行為事實" : "正解：評價性措辭"));
+    ans.appendChild(right);
+    ans.appendChild(el("p", "ma-why", it.why));
+    row.appendChild(ans);
+    ansSink.push({ el: ans, key: key, a: it.a });
+
+    return row;
+  }
+
+  function csTask(caseId, rec, t, ti) {
+    var box = el("div", "case-task");
+    box.appendChild(el("div", "ct-q", t.q));
+    if (t.hint) box.appendChild(el("p", "ct-hint", t.hint));
+
+    if (t.type === "table") {
+      t.rows.forEach(function (rowLabel, ri) {
+        box.appendChild(csPair(caseId, rec, ti + ":" + ri, rowLabel, false));
+      });
+      return box;
+    }
+    if (t.type === "long") {
+      box.appendChild(csPair(caseId, rec, ti + ":0", null, true));
+      return box;
+    }
+    if (t.type === "mark") {
+      var list = el("div", "mark-list");
+      var ansSink = [];
+      t.items.forEach(function (it, ii) {
+        list.appendChild(csMarkItem(caseId, rec, ti, ii, it, ansSink));
+      });
+      box.appendChild(list);
+
+      var bar = el("div", "row-btns");
+      var kb = el("button", "btn primary", "核對這一段");
+      kb.type = "button";
+      bar.appendChild(kb);
+      box.appendChild(bar);
+
+      var res = el("p", "mark-result");
+      kb.addEventListener("click", function () {
+        var marked = 0, right = 0;
+        ansSink.forEach(function (x) {
+          if (rec.m[x.key]) marked++;
+          if (rec.m[x.key] === x.a) right++;
+          x.el.hidden = false;
+        });
+        res.textContent = "你標了 " + marked + " / " + ansSink.length + " 句，對 " + right + " 句。" +
+          (marked < ansSink.length ? "（還有沒標的）" :
+            (right === ansSink.length ? "　全對。" : "　錯的看上面每一句的解說。"));
+      });
+      box.appendChild(res);
+      if (t.foot) box.appendChild(el("p", "ct-hint foot", t.foot));
+      return box;
+    }
+    return box;
+  }
+
+  function renderCaseBody() {
+    var C = window.CASES;
+    var c = C.cases[csSel];
+    var body = $("#csBody");
+    body.innerHTML = "";
+    var rec = caseRec(c.id);
+
+    body.appendChild(el("p", "cl-purpose", c.focus));
+
+    /* ---- 【一】觀察素材 ---- */
+    var p1 = el("div", "panel");
+    p1.appendChild(el("h2", null, "【一】觀察素材"));
+    p1.appendChild(el("p", "muted small",
+      "只給這一段，不給結局。先讀，先寫，再往下。　出處：" + c.sources.join("、")));
+    c.observe.forEach(function (o) {
+      var box = el("div", "cl-card");
+      box.appendChild(el("div", "cl-title", o.h));
+      box.appendChild(el("div", "muted small", o.src));
+      box.appendChild(el("blockquote", "cl-orig big", o.text));
+      p1.appendChild(box);
+    });
+    body.appendChild(p1);
+
+    /* ---- 【二】你的判斷 ---- */
+    var p2 = el("div", "panel");
+    p2.appendChild(el("h2", null, "【二】你的判斷"));
+    p2.appendChild(el("p", "muted small",
+      "⚠ 每題都要寫【依據】——你是從哪一句話、哪一個動作推出這個判斷的。只寫結論不給依據的，無法復盤。"));
+    c.tasks.forEach(function (t, ti) { p2.appendChild(csTask(c.id, rec, t, ti)); });
+    body.appendChild(p2);
+
+    /* ---- 【三】結局核對（摺疊）---- */
+    var det = el("details", "hist");
+    var sum = el("summary", null, "【三】結局核對　（寫完你的判斷，再打開這裡）");
+    det.appendChild(sum);
+    var db = el("div", "hist-body");
+    db.appendChild(el("p", null, c.ending.text));
+    if (c.ending.cols) {
+      db.appendChild(csTable(c.ending.cols, c.ending.rows));
+    }
+    if (c.ending.quote) db.appendChild(el("blockquote", "cl-orig", c.ending.quote));
+    if (c.ending.foot) db.appendChild(el("p", "cl-trait", c.ending.foot));
+    det.appendChild(db);
+    body.appendChild(det);
+
+    /* ---- 史料風險（第 ③ 篇）---- */
+    if (c.risk) body.appendChild(csRisk(c.risk));
+
+    /* ---- 【四】復盤：展開結局後才出現 ---- */
+    var p4 = el("div", "panel");
+    p4.appendChild(el("h2", null, "【四】復盤"));
+    p4.appendChild(el("p", "muted small", "不做復盤，這題等於沒練。先自己回答，再看解說。"));
+    c.review.forEach(function (rv, i) {
+      var d = el("div", "act");
+      d.appendChild(el("div", "act-t", "復盤 " + (i + 1) + "．" + rv.q));
+      var rb = el("details", "cl-vars");
+      rb.appendChild(el("summary", null, "看解說"));
+      rb.appendChild(el("p", "act-d", rv.a));
+      d.appendChild(rb);
+      p4.appendChild(d);
+    });
+
+    /* ---- 錯誤類型勾選 ---- */
+    if (c.errorTypes && c.errorTypes.length) {
+      var eb = el("div", "panel");
+      eb.appendChild(el("h2", null, "把你的推測與結局對照，錯在哪一個？（可多選）"));
+      c.errorTypes.forEach(function (t, i) {
+        var lab = el("label", "check-row");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = rec.e.indexOf(i) >= 0;
+        cb.addEventListener("change", function () {
+          var k = rec.e.indexOf(i);
+          if (cb.checked && k < 0) rec.e.push(i);
+          if (!cb.checked && k >= 0) rec.e.splice(k, 1);
+          caseSave(c.id);
+        });
+        lab.appendChild(cb);
+        lab.appendChild(el("span", null, t));
+        eb.appendChild(lab);
+      });
+      p4.appendChild(eb);
+    }
+
+    /* ---- 教員用（摺起）---- */
+    p4.appendChild(csTeacher(c.teacher));
+
+    p4.hidden = true;
+    body.appendChild(p4);
+    det.addEventListener("toggle", function () { if (det.open) p4.hidden = false; });
+  }
+
+  function csRisk(r) {
+    var box = el("div", "panel warn-panel");
+    box.appendChild(el("h2", null, "⚠ " + r.title));
+    box.appendChild(el("p", "cl-purpose", r.lead));
+    r.items.forEach(function (x) {
+      var d = el("div", "act");
+      d.appendChild(el("div", "act-t", "· " + x.t));
+      d.appendChild(el("div", "act-d", x.d));
+      box.appendChild(d);
+    });
+    box.appendChild(el("blockquote", "cl-orig", r.quote));
+    box.appendChild(el("p", "cl-trait", r.close));
+    return box;
+  }
+
+  function csTeacher(t) {
+    if (!t) return el("span");
+    var det = el("details", "cl-vars");
+    det.appendChild(el("summary", null, "教員用（學員不必先看）"));
+    var b = el("div", "hist-body");
+    var s1 = el("div", "hist-sec");
+    s1.appendChild(el("div", "cl-lbl grade-a", "為什麼選這一篇"));
+    t.why.forEach(function (x) { s1.appendChild(el("div", "act-d", "· " + x)); });
+    b.appendChild(s1);
+
+    var s2 = el("div", "hist-sec");
+    s2.appendChild(el("div", "cl-lbl grade-a", "討論時可追問"));
+    t.ask.forEach(function (x, i) { s2.appendChild(el("div", "act-d", (i + 1) + ". " + x)); });
+    b.appendChild(s2);
+
+    var s3 = el("div", "hist-sec");
+    s3.appendChild(el("div", "cl-lbl grade-c", "三個陷阱（講之前自己先想清楚）"));
+    t.traps.forEach(function (x) { s3.appendChild(el("div", "act-d", "· " + x)); });
+    b.appendChild(s3);
+
+    if (t.extend) {
+      var s4 = el("div", "hist-sec");
+      s4.appendChild(el("div", "cl-lbl grade-b", t.extend.t));
+      s4.appendChild(el("div", "act-d", t.extend.d));
+      b.appendChild(s4);
+    }
+    det.appendChild(b);
+    return det;
   }
 
   /* ============================================================
@@ -3510,31 +3885,6 @@
     renderTrack();
 
     // 只在使用者進入時才初始化該模組（避免每次開站都重設）
-    var inited = {};
-    function ensure(route) {
-      if (inited[route]) return;
-      inited[route] = true;
-      if (route === "classify") renderClassify();
-      if (route === "quiz") renderQuiz();
-      if (route === "scenarios") renderScenarios();
-      if (route === "interrater") renderInterrater();
-      if (route === "tongue") renderTongue();
-      if (route === "ledger") renderLedger();
-      if (route === "track") renderTrack();
-      if (route === "philosophy") renderPhilosophy();
-      if (route === "lessons") renderLessons();
-      if (route === "lesson") renderLesson();
-      if (route === "recite") renderRecite();
-      if (route === "method") renderMethod();
-      if (route === "drills") renderDrills();
-      if (route === "mastery") renderMastery();
-      if (route === "progress") renderProgress();
-      if (route === "provenance") renderProvenance();
-      if (route === "constitution") renderConstitution();
-      if (route === "wangzhen") renderWangzhen();
-      if (route === "classics") renderClassics();
-      if (route === "print") renderPrintSheet();
-    }
 
     function route() {
       var r = currentRoute();

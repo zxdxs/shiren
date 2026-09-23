@@ -212,6 +212,7 @@ try {
 
   section("載入 crypto.js 與 vault.js");
   vm.runInContext(fs.readFileSync(path.join(ROOT, "assets", "courseware.js"), "utf8"), sandbox);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "assets", "cases.js"), "utf8"), sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, "assets", "crypto.js"), "utf8"), sandbox);
   vm.runInContext(fs.readFileSync(path.join(ROOT, "assets", "vault.js"), "utf8"), sandbox);
   ok(!!sandbox.window.SHREN_CRYPTO, "SHREN_CRYPTO 已載入");
@@ -223,7 +224,7 @@ try {
   ok(true, "init 執行完畢，未拋出例外");
 
   section("首頁與導覽");
-  ok(byId("homeCards").children.length === 10, "首頁入口卡 = " + byId("homeCards").children.length + "（應 10）");
+  ok(byId("homeCards").children.length === 11, "首頁入口卡 = " + byId("homeCards").children.length + "（應 11）");
   ok(byId("homeNumbers").children.length === 5, "訓練站數字 5 格（含 24 條記誦）");
   ok(byId("homeCta").children.length === 3, "三個主要入口");
   ok((byId("homeThesis")._text || "").indexOf("知道") >= 0, "知道→做到→遷移 定位");
@@ -233,7 +234,7 @@ try {
   ok(byId("homeLevels").children[0].children.length === 6, "五層表 1 表頭 + 5 層");
   ok(txt(byId("homeHow")).length > 0, "怎麼練清單");
   ok(txt(byId("homeWarmup")).indexOf("熱身") >= 0, "公共熱身");
-  ok(byId("nav").children.length === 11, "導覽項目 = " + byId("nav").children.length + "（首頁+10，應 11）");
+  ok(byId("nav").children.length === 12, "導覽項目 = " + byId("nav").children.length + "（首頁+11，應 12）");
 
   section("體例：理念／課件／方法／題庫／自測／進度／出處");
   go("#/philosophy");
@@ -893,6 +894,66 @@ try {
 
 
   }
+
+  section("案例復訓（史料案例）");
+  const CS = sandbox.window.CASES;
+  ok(!!CS, "CASES 已載入");
+  ok(CS.cases.length === 3, "三篇：" + CS.cases.length);
+  ok(CS.meta.positioning.length === 4, "定位說明 4 句");
+  ok(CS.meta.positioning.some(t => t.indexOf("延伸訓練") >= 0), "定位：明示是延伸訓練");
+  ok(CS.meta.positioning.some(t => t.indexOf("讀史 ≠ 識人") >= 0), "定位：讀史 ≠ 識人");
+  ok(CS.meta.positioning.some(t => t.indexOf("推測單") >= 0), "定位：明示不替代真人推測單");
+  ok(CS.meta.stepMap.length === 5, "四步／五步對照 5 列");
+  ok(CS.meta.stepMap.some(r => r.m.indexOf("立基線") >= 0 && r.d.indexOf("没有基線") >= 0 || r.d.indexOf("沒有基線") >= 0),
+     "對照表：明示立基線做不了");
+
+  const markItems = CS.cases.reduce((a, c) =>
+    a + c.tasks.filter(t => t.type === "mark").reduce((b, t) => b + t.items.length, 0), 0);
+  ok(markItems === 23, "事實／評價標記共 " + markItems + " 句");
+  ok(CS.cases[2].risk, "第 ③ 篇有史料風險區塊");
+  ok(CS.cases[2].risk.items.some(x => x.d.indexOf("事後加工") >= 0), "風險：點出可能為事後加工");
+  ok(CS.cases[2].risk.items.some(x => x.t.indexOf("司馬遷不可能在場") >= 0), "風險：點出叙述者不在場");
+  ok(CS.cases.every(c => c.review.length >= 4), "每篇復盤 >= 4 題");
+  ok(CS.cases.every(c => c.teacher && c.teacher.why.length && c.teacher.ask.length && c.teacher.traps.length),
+     "每篇都有教員提示卡（為什麼／追問／陷阱）");
+  ok(CS.cases.every(c => c.ending && c.ending.rows && c.ending.rows.length >= 3), "每篇都有結局對照表");
+  ok(CS.cases.every(c => c.observe.every(o => o.text.indexOf("韩") < 0 && o.text.indexOf("练") < 0)),
+     "原文皆為繁體（無簡體殘留）");
+  ok(CS.cases.some(c => c.tasks.some(t => t.type === "mark" &&
+       t.items.some(i => i.t.indexOf("孰視之") >= 0))), "標記含「孰視之」");
+
+  go("#/cases");
+  ok(txt(byId("csTitle")).length > 0, "案例復訓頁已渲染：" + txt(byId("csTitle")));
+  ok(byId("csPositioning").children.length === 4, "定位說明已渲染 4 條");
+  ok(byId("csLegend").children.length === 2, "圖例 2 條");
+  ok(byId("csTabs").children.length === 3, "三篇 tab");
+  ok(byId("csStepMap").children.length === 1, "五步對照表已渲染");
+
+  const body0 = txt(byId("csBody"));
+  ok(body0.indexOf("觀察素材") >= 0, "【一】觀察素材");
+  ok(body0.indexOf("你的判斷") >= 0, "【二】你的判斷");
+  ok(body0.indexOf("結局核對") >= 0, "【三】結局核對");
+  ok(body0.indexOf("淮南") < 0 && body0.indexOf("淮陰侯韓信者") >= 0, "原文已渲染");
+
+  /* 依據提示：只寫判斷不寫依據 → 標「無法復盤」 */
+  const pair = makeQ(".case-pair", byId("csBody"))[0];
+  ok(!!pair, "找到第一個填寫區塊");
+  const csTas = makeQ("textarea", pair);
+  ok(csTas.length === 2, "填寫區塊有判斷欄與依據欄");
+  csTas[0].value = "我覺得他是個好人";
+  fire(csTas[0], "input", {});
+  const csWarn = makeQ(".basis-warn", pair)[0];
+  ok(csWarn && csWarn.hidden === false, "只寫判斷沒寫依據 → 顯示「無法復盤」提示");
+  csTas[1].value = "因為他給了數十日飯";
+  fire(csTas[1], "input", {});
+  ok(csWarn.hidden === true, "補上依據 → 提示消失");
+
+  ok(localStorage.getItem("shiren.v1").indexOf('"cases"') >= 0, "state.cases 已寫入 localStorage");
+
+  /* 匯入／清空後仍保有 cases 鍵 */
+  const stC = JSON.parse(localStorage.getItem("shiren.v1"));
+  ok(stC.cases && typeof stC.cases === "object", "state.cases 為物件");
+  ok(!!sandbox.window.STATION, "（cases 併入統一重繪路徑 RENDERERS／rerenderInited）");
 
   section("教學者頁與資料管理");
   go("#/teacher");

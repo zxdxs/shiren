@@ -693,3 +693,45 @@ details.hist[open] > summary { margin-bottom: 9px; }
   #view-print > h1, #view-print > .lead { display: none; }
   .sheet-foot { break-inside: avoid; }
 }
+
+/* ============================================================
+   案例復訓（史料案例）
+   沿用既有變數，不新造樣式體系。
+   ============================================================ */
+.lg-row { display: flex; gap: 9px; align-items: flex-start; flex-wrap: wrap; padding: 4px 0; }
+.lg-row .chip { flex: 0 0 auto; }
+
+.case-task { padding: 13px 0; border-bottom: 1px solid var(--line-soft); }
+.case-task:last-child { border-bottom: 0; }
+.ct-q { font-weight: 700; font-size: 15.5px; line-height: 1.6; }
+.ct-hint { font-size: 13.5px; color: var(--muted); margin: 5px 0 9px; line-height: 1.65; }
+.ct-hint.foot { color: var(--brand); font-weight: 600; margin-top: 10px; }
+
+.case-pair { margin: 9px 0 0; padding: 11px 13px; background: var(--paper);
+             border: 1px solid var(--line-soft); border-radius: var(--radius-sm); }
+.cp-label { font-weight: 700; font-size: 14.5px; color: var(--brand); margin-bottom: 8px; }
+.case-pair .field { margin-bottom: 10px; }
+.case-pair .field:last-of-type { margin-bottom: 4px; }
+.basis-warn { font-size: 13px; color: #a4432b; margin: 4px 0 0; font-weight: 600; }
+
+.mark-list { margin: 4px 0 10px; }
+.mark-row { padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.mark-row:last-child { border-bottom: 0; }
+.mark-sent { font-size: 15px; line-height: 1.7; }
+.mark-sent::before { content: "「"; color: var(--muted); }
+.mark-sent::after  { content: "」"; color: var(--muted); }
+.mark-btns { display: flex; gap: 7px; margin-top: 7px; flex-wrap: wrap; }
+.mark-ans { margin-top: 8px; padding: 9px 12px; background: var(--brand-soft);
+            border-radius: var(--radius-sm); }
+.ma-h { margin-bottom: 4px; }
+.ma-why { font-size: 14px; line-height: 1.7; color: var(--ink-soft); margin: 0; }
+.mark-result { font-weight: 600; font-size: 14.5px; margin: 9px 0 0; }
+
+.check-row { display: flex; gap: 9px; align-items: flex-start; padding: 7px 0;
+             font-size: 14.5px; line-height: 1.65; cursor: pointer; }
+.check-row input { margin-top: 4px; flex: 0 0 auto; }
+
+@media (max-width: 480px) {
+  .case-pair { padding: 9px 10px; }
+  .mark-sent { font-size: 14.5px; }
+}

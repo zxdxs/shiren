@@ -109,7 +109,7 @@ const CR = [
 /* 只掃「會發布出去的內容檔」。tools/ 是檢查工具本身，裡面出現這些字串
    是搜尋樣式，不是內容——把它們也算進來會讓檢查自己告自己。 */
 const CONTENT = ["index.html", "README.md", "assets/data.js", "assets/app.js",
-                 "assets/courseware.js", "assets/crypto.js", "assets/style.css"];
+                 "assets/courseware.js", "assets/cases.js", "assets/crypto.js", "assets/style.css"];
 const crHits = [];
 CONTENT.forEach(function (f) {
   const t = read(f);
@@ -141,6 +141,32 @@ ok(absRefs.length === 0, absRefs.length ? "有根絕對路徑（專案頁會 404
 const ext = (html.match(/(?:src|href)="https?:\/\/(?!www\.w3\.org)[^"]*"/g) || []);
 ok(ext.length === 0, ext.length ? "有外部資源引用：" + ext.join("、") : "無外部資源引用（離線可用）");
 ok(files.indexOf(".nojekyll") >= 0, ".nojekyll 已被追蹤（否則 _ 開頭檔案會被 Jekyll 吃掉）");
+
+/* ---------- ⑩ 禁語：跨站污染一律為零 ---------- */
+/* 兩站零關聯。這些詞一個都不准出現在任何內容檔。 */
+console.log("\n⑩ 禁語：跨站詞與指定人名一律 0 命中");
+const BANNED = ["solve-lab", "解题站", "解題站", "江丕权", "江丕權",
+                "錢穆", "黃永年", "胡嘉", "王玉祥", "嚴耕望"];
+const bannedHits = [];
+CONTENT.forEach(function (f) {
+  const t = read(f);
+  BANNED.forEach(function (w) { if (t.indexOf(w) >= 0) bannedHits.push(f + " → " + w); });
+});
+ok(bannedHits.length === 0, bannedHits.length ? "禁語命中：" + bannedHits.join("、")
+                                              : "禁語 0 命中（掃 " + CONTENT.length + " 檔 · " + BANNED.length + " 詞）");
+
+/* ---------- ⑪ 案例復訓內容完整性 ---------- */
+console.log("\n⑪ 案例復訓：內容與存檔一致性");
+const casesSrc = read("assets/cases.js");
+ok(casesSrc.indexOf("window.CASES") >= 0, "cases.js 已掛上 window.CASES");
+ok(casesSrc.indexOf("讀史 ≠ 識人") >= 0, "定位說明含「讀史 ≠ 識人」");
+ok(casesSrc.indexOf("不替代真人推測單") >= 0, "定位說明含「不替代真人推測單」");
+ok(casesSrc.indexOf("立基線") >= 0, "四步／五步對照已寫入");
+ok(read("index.html").indexOf('id="view-cases"') >= 0, "index.html 有 view-cases");
+ok(appSrc7.indexOf("cases: renderCases") >= 0, "RENDERERS 已註冊 cases");
+ok(appSrc7.indexOf("cases: {}") >= 0 && appSrc7.indexOf("d.cases = ") >= 0,
+   "state 有 cases 鍵（defaultState 與 adoptState 兩處）");
+ok(appSrc7.indexOf("function rerenderInited") >= 0, "已有統一重繪 rerenderInited");
 
 /* ---------- 結果 ---------- */
 console.log("\n" + "=".repeat(52));
