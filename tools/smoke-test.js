@@ -416,6 +416,21 @@ try {
 
   go("#/provenance");
   ok(byId("pvSources").children[0].children.length === 9, "來源表 1 表頭 + 8 來源");
+
+  /* --- 指正與聯絡 --- */
+  const CTCT = sandbox.window.STATION.system.provenance.contact;
+  ok(!!CTCT, "出處頁有「指正與聯絡」區塊");
+  ok(CTCT.items.length === 2, "聯絡方式 2 種：" + CTCT.items.map(i => i.k).join("、"));
+  ok(CTCT.items.some(i => i.k === "微信" && i.qr), "微信項含二維碼圖檔");
+  ok(CTCT.items.some(i => i.k === "郵箱" && i.mail), "郵箱項含信箱");
+  ok(txt(byId("pvContactTitle")).length > 0, "聯絡區塊標題已渲染：" + txt(byId("pvContactTitle")));
+  ok(byId("pvContact").children.length === 2, "聯絡卡渲染 2 張");
+  const qrImg = makeQ("img.cc-qr", byId("pvContact"))[0];
+  ok(!!qrImg && qrImg.src === "assets/wechat-qr.jpg", "二維碼圖路徑正確：" + (qrImg && qrImg.src));
+  ok(!!qrImg && qrImg.alt.indexOf("課孫翁") >= 0, "二維碼有替代文字（無障礙）");
+  const mailA = makeQ("a.cc-mail", byId("pvContact"))[0];
+  ok(!!mailA && String(mailA.href).indexOf("mailto:") === 0, "信箱為 mailto 連結：" + (mailA && mailA.href));
+  ok(txt(byId("pvContactClose")).length > 0, "聯絡區塊收尾語已渲染");
   ok(byId("pvVariants").children[0].children.length === 6, "版本差異表 1 表頭 + 5 條");
   ok(txt(byId("pvSources")).indexOf("望診遵經") >= 0, "來源含望診遵經");
   ok(txt(byId("pvSources")).indexOf("公有領域") >= 0, "標明權利狀態");

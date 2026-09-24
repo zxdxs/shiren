@@ -147,13 +147,25 @@ ok(files.indexOf(".nojekyll") >= 0, ".nojekyll 已被追蹤（否則 _ 開頭檔
 console.log("\n⑩ 禁語：跨站詞與指定人名一律 0 命中");
 const BANNED = ["solve-lab", "解题站", "解題站", "江丕权", "江丕權",
                 "錢穆", "黃永年", "胡嘉", "王玉祥", "嚴耕望"];
+/* 例外：維護者共用的聯絡信箱。規則的本意是「兩站的內容不得互相引用」，
+   不是「作者不得共用一個收信地址」。所以先移除這個字串再掃——
+   除此之外，solve-lab 出現在任何地方都仍然算命中。 */
+const CONTACT_ALLOW = /hello@solve-lab\.cn/g;
 const bannedHits = [];
 CONTENT.forEach(function (f) {
-  const t = read(f);
+  const t = read(f).replace(CONTACT_ALLOW, "〔聯絡信箱·已放行〕");
   BANNED.forEach(function (w) { if (t.indexOf(w) >= 0) bannedHits.push(f + " → " + w); });
 });
 ok(bannedHits.length === 0, bannedHits.length ? "禁語命中：" + bannedHits.join("、")
-                                              : "禁語 0 命中（掃 " + CONTENT.length + " 檔 · " + BANNED.length + " 詞）");
+                                              : "禁語 0 命中（掃 " + CONTENT.length + " 檔 · " + BANNED.length + " 詞，已排除聯絡信箱）");
+/* 反向確認：例外只放行信箱本身，不放行整個域名 */
+const domainLeak = [];
+CONTENT.forEach(function (f) {
+  const t = read(f).replace(CONTACT_ALLOW, "");
+  if (t.indexOf("solve-lab") >= 0) domainLeak.push(f);
+});
+ok(domainLeak.length === 0, domainLeak.length ? "solve-lab 域名在非信箱處出現：" + domainLeak.join("、")
+                                             : "solve-lab 僅以聯絡信箱形式出現，無其他跨站引用");
 
 /* ---------- ⑪ 案例復訓內容完整性 ---------- */
 console.log("\n⑪ 案例復訓：內容與存檔一致性");

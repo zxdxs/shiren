@@ -735,3 +735,31 @@ details.hist[open] > summary { margin-bottom: 9px; }
   .case-pair { padding: 9px 10px; }
   .mark-sent { font-size: 14.5px; }
 }
+
+/* ============================================================
+   出處頁 · 指正與聯絡
+   ============================================================ */
+.contact-grid { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 11px; }
+.contact-card {
+  flex: 1 1 15rem; min-width: 0;
+  border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+  padding: 14px 16px; background: var(--paper); text-align: center;
+}
+.contact-card .cc-t { font-weight: 700; font-size: 15px; color: var(--brand); }
+.contact-card .cc-d { font-size: 14px; color: var(--ink-soft); line-height: 1.7; margin: 7px 0; }
+.contact-card .cc-qr {
+  display: block; margin: 10px auto 6px;
+  max-width: 11rem; width: 62%; height: auto;
+  border: 1px solid var(--line); border-radius: 4px;
+}
+.contact-card .cc-mail {
+  display: inline-block; margin-top: 10px; font-size: 14.5px;
+  word-break: break-all; color: var(--brand);
+}
+.contact-card .cc-note { margin: 2px 0 0; }
+
+@media (max-width: 480px) {
+  .contact-grid { gap: 10px; }
+  .contact-card { flex: 1 1 100%; padding: 12px 13px; }
+  .contact-card .cc-qr { max-width: 9.5rem; width: 58%; }
+}

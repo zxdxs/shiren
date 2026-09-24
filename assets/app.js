@@ -928,6 +928,34 @@
     sb.appendChild(t);
 
     $("#pvDisclaimer").textContent = P.disclaimer;
+
+    /* ---- 指正與聯絡 ---- */
+    var CT = P.contact;
+    if (CT) {
+      $("#pvContactTitle").textContent = CT.title;
+      $("#pvContactLead").textContent = CT.lead;
+      var cb = $("#pvContact");
+      cb.innerHTML = "";
+      CT.items.forEach(function (it) {
+        var card = el("div", "contact-card");
+        card.appendChild(el("div", "cc-t", it.k));
+        card.appendChild(el("p", "cc-d", it.d));
+        if (it.qr) {
+          var img = el("img", "cc-qr");
+          img.src = it.qr;
+          img.alt = it.qrAlt || it.k;
+          card.appendChild(img);
+        }
+        if (it.mail) {
+          var a2 = el("a", "cc-mail", it.mailText || it.mail);
+          a2.href = "mailto:" + it.mail;
+          card.appendChild(a2);
+        }
+        if (it.note) card.appendChild(el("p", "muted small cc-note", it.note));
+        cb.appendChild(card);
+      });
+      $("#pvContactClose").textContent = CT.close || "";
+    }
     $("#pvVariantsTitle").textContent = P.variantsTitle;
     $("#pvVariantsNote").textContent = P.variantsNote;
     var vb = $("#pvVariants");
